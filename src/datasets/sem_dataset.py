@@ -12,8 +12,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from src.datasets.scanner import DatasetPair, DatasetScanner
-from src.datasets.validator import DatasetValidator
+from .scanner import DatasetPair, DatasetScanner
+from .validator import DatasetValidator
 
 
 class SEMDataset(Dataset):

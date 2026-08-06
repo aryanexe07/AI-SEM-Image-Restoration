@@ -1,8 +1,8 @@
 """Dataset loading, indexing, scanning, validation, and PyTorch dataset modules."""
 
-from src.datasets.scanner import DatasetPair, DatasetScanner
-from src.datasets.sem_dataset import SEMDataset
-from src.datasets.validator import (
+from .scanner import DatasetPair, DatasetScanner
+from .sem_dataset import SEMDataset
+from .validator import (
     DatasetValidationError,
     DatasetValidator,
     InvalidDtypeError,

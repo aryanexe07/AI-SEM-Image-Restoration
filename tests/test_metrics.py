@@ -1,8 +1,6 @@
-"""Placeholder pytest module for PSNR and SSIM metric tests."""
-
-import pytest
+"""Placeholder test module for PSNR and SSIM metric tests."""
 
 
-def test_metrics_placeholder() -> None:
-    """Placeholder test for future PSNR and SSIM calculation modules."""
+def test_placeholder_metrics() -> None:
+    """Placeholder test for metrics module."""
     assert True

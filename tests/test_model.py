@@ -1,8 +1,6 @@
-"""Placeholder pytest module for NAFNet model architecture tests."""
-
-import pytest
+"""Placeholder test module for NAFNet model architecture tests."""
 
 
-def test_model_placeholder() -> None:
-    """Placeholder test for future NAFNet forward pass tests."""
+def test_placeholder_model() -> None:
+    """Placeholder test for model architecture module."""
     assert True

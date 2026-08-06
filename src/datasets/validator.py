@@ -9,7 +9,7 @@ from typing import Sequence, Tuple
 
 import numpy as np
 
-from src.datasets.scanner import DatasetPair
+from .scanner import DatasetPair
 
 
 class DatasetValidationError(Exception):
