@@ -1,0 +1,36 @@
+# Training Configuration Placeholder
+
+# Optimization Hyperparameters
+# batch_size:
+# epochs:
+# learning_rate:
+# weight_decay:
+# beta1:
+# beta2:
+
+# Optimizer & Scheduler
+# optimizer: # e.g., "AdamW"
+# scheduler: # e.g., "CosineAnnealingLR"
+# min_lr:
+# warmup_epochs:
+
+# Loss Functions
+# loss_type: # e.g., "PSNRLoss", "CharbonnierLoss", "L1Loss"
+
+# Training Settings
+# mixed_precision: # true / false
+# gradient_clip_val:
+# val_freq: # Save/validate every N epochs
+# log_freq: # Log metrics every N steps
+
+# Data Configuration
+# dataset_path:
+# patch_size:
+# augmentations:
+#   - name: "HorizontalFlip"
+#   - name: "VerticalFlip"
+#   - name: "RandomRotate90"
+
+# Checkpoint Management
+# checkpoint_dir:
+# save_top_k:

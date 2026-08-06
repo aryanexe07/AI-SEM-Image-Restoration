@@ -1,0 +1,19 @@
+# Inference & Evaluation Configuration Placeholder
+
+# Model Checkpoint
+# checkpoint_path: # e.g., "outputs/checkpoints/best_model.pth"
+
+# Inference Settings
+# input_dir: # Path to degraded SEM test images / .npy files
+# output_dir: # Path to save restored predictions
+# batch_size: 1
+# device: "cuda"
+
+# Tiling / Sliding Window Options (for high-resolution SEM images)
+# use_tiling: false
+# tile_size: 512
+# tile_overlap: 64
+
+# Metrics Calculation
+# calculate_metrics: true # Compute PSNR and SSIM if ground truth is available
+# ground_truth_dir:

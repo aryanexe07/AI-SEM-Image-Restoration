@@ -1,0 +1,15 @@
+# NAFNet Model Configuration Placeholder
+
+# Model Architecture Parameters
+# model_name: "NAFNet"
+# in_channels: # e.g., 1 (grayscale SEM) or 3
+# out_channels: # e.g., 1 or 3
+# width: # e.g., 32, 64
+# middle_blk_num: # e.g., 1, 12
+# enc_blk_nums: # e.g., [2, 2, 4, 8]
+# dec_blk_nums: # e.g., [2, 2, 2, 2]
+
+# NAFNet Specific Modules
+# use_simple_gate: true
+# use_sca: true # Simplified Channel Attention
+# drop_path: 0.0

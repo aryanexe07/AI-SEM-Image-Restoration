@@ -1,0 +1,16 @@
+# Experiment 001 Configuration Override Placeholder
+# Baseline NAFNet SEM Image Restoration Experiment
+
+# _base_: "../default.yaml"
+# experiment_id: "exp001_nafnet_width32"
+# description: "Baseline NAFNet with width=32 on degraded SEM patch dataset."
+
+# train:
+#   batch_size: 16
+#   epochs: 100
+#   learning_rate: 1.0e-3
+
+# model:
+#   width: 32
+#   enc_blk_nums: [2, 2, 4, 8]
+#   dec_blk_nums: [2, 2, 2, 2]
