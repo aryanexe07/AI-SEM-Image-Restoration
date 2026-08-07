@@ -79,6 +79,7 @@ venv.bak/
 # IDE / Editors
 .vscode/
 .idea/
+.obsidian/
 *.swp
 *.swo
 
