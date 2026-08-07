@@ -11,7 +11,6 @@ Usage:
 
 import argparse
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -123,7 +122,7 @@ class SEMDatasetAnalyzer:
         # Analysis storage
         self.stats: Dict[str, Any] = {}
 
-    def validate_structure(self) -> Dict[str, Any]:
+    def validate_structure(self) -> Dict[str, Any]:  # noqa: C901
         """Validate directory hierarchy and discover GT/NoisyLR folders.
 
         Returns:
@@ -204,11 +203,9 @@ class SEMDatasetAnalyzer:
         gt_map = {f.name: f for f in self.train_gt_files}
         noisy_map = {f.name: f for f in self.train_noisy_files}
 
-        matched_names = sorted(
-            list(set(gt_map.keys()).intersection(set(noisy_map.keys())))
-        )
-        gt_only = sorted(list(set(gt_map.keys()) - set(noisy_map.keys())))
-        noisy_only = sorted(list(set(noisy_map.keys()) - set(gt_map.keys())))
+        matched_names = sorted(set(gt_map.keys()).intersection(set(noisy_map.keys())))
+        gt_only = sorted(set(gt_map.keys()) - set(noisy_map.keys()))
+        noisy_only = sorted(set(noisy_map.keys()) - set(gt_map.keys()))
 
         corrupted_files: List[str] = []
         nan_inf_files: List[str] = []
@@ -501,9 +498,9 @@ class SEMDatasetAnalyzer:
 
         report_md = f"""# Dataset Characterization & Analysis Report
 
-**Project Title**: AI-Based Restoration of Degraded Scanning Electron Microscope (SEM) Images using NAFNet  
-**Dataset Root**: `{self.root_path}`  
-**Report Generated**: Real-time Empirical Dataset Profiling  
+**Project Title**: AI-Based Restoration of Degraded Scanning Electron Microscope (SEM) Images using NAFNet
+**Dataset Root**: `{self.root_path}`
+**Report Generated**: Real-time Empirical Dataset Profiling
 
 ---
 
