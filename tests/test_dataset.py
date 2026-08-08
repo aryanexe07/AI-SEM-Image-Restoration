@@ -57,6 +57,7 @@ def test_sem_dataset_intensity_clipping(tmp_path: Path) -> None:
     sample = dataset[0]
 
     input_tensor = sample["input"]
+    assert isinstance(input_tensor, torch.Tensor)
     assert torch.min(input_tensor).item() >= 0.0
     assert torch.max(input_tensor).item() <= 1.0
 
@@ -72,6 +73,8 @@ def test_sem_dataset_test_split(tmp_path: Path) -> None:
     dataset = SEMDataset(dataset_root, split="test")
     sample = dataset[0]
 
+    input_tensor = sample["input"]
+    assert isinstance(input_tensor, torch.Tensor)
     assert sample["filename"] == "test_001"
-    assert sample["input"].shape == (1, 128, 128)
+    assert input_tensor.shape == (1, 128, 128)
     assert sample["target"] is None

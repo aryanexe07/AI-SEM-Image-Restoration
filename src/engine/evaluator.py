@@ -245,6 +245,7 @@ class Evaluator:
         total_samples = 0
         vis_count = 0
         global_idx = 0
+        has_target = False
 
         with torch.no_grad():
             for batch in self.data_loader:

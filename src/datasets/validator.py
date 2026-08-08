@@ -5,7 +5,7 @@ integrity, array shapes, data types, and pairing consistency of SEM dataset samp
 """
 
 from pathlib import Path
-from typing import Sequence, Tuple
+from typing import Any, Sequence, Tuple
 
 import numpy as np
 
@@ -37,7 +37,7 @@ class DatasetValidator:
         self,
         gt_shape: Tuple[int, ...] = (256, 256),
         noisy_shape: Tuple[int, ...] = (128, 128),
-        expected_dtype: np.dtype = np.float32,
+        expected_dtype: Any = np.float32,
     ) -> None:
         """Initialize DatasetValidator with expected array dimensions and data types.
 

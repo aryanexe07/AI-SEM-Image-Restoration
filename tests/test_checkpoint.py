@@ -188,6 +188,7 @@ def test_lower_psnr_does_not_replace_best(tmp_path: Path) -> None:
 
     mgr.save(epoch=1, model=model, optimizer=optimizer, metric=30.0)
     best_path = mgr.get_best_checkpoint_path()
+    assert best_path is not None
 
     # Attempt lower metric
     mgr.save(epoch=2, model=model, optimizer=optimizer, metric=27.0)

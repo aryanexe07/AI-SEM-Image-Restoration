@@ -62,10 +62,14 @@ class PairedTransforms:
             else False
         )
 
-        input_np = input_image.squeeze(0).numpy() if is_input_tensor else input_image
+        input_np = (
+            input_image.squeeze(0).numpy()
+            if isinstance(input_image, torch.Tensor)
+            else input_image
+        )
         target_np = (
             target_image.squeeze(0).numpy()
-            if is_target_tensor and target_image is not None
+            if isinstance(target_image, torch.Tensor)
             else target_image
         )
 

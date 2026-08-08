@@ -136,12 +136,12 @@ class TestEvaluatorConstruction:
         loader = DataLoader(dataset, batch_size=2, collate_fn=_collate_fn)
 
         with pytest.raises(TypeError, match="must be a torch.nn.Module"):
-            Evaluator(model="not_a_module", data_loader=loader)
+            Evaluator(model="not_a_module", data_loader=loader)  # type: ignore[arg-type]
 
     def test_construction_invalid_loader(self) -> None:
         model = TinyIdentityModel()
         with pytest.raises(ValueError, match="cannot be None"):
-            Evaluator(model=model, data_loader=None)
+            Evaluator(model=model, data_loader=None)  # type: ignore[arg-type]
 
     def test_construction_invalid_max_vis(self) -> None:
         model = TinyIdentityModel()
@@ -288,7 +288,7 @@ class TestModelModeRestoration:
             evaluator.evaluate(save_visualizations=False)
 
             # Model mode must be restored to training=True
-            assert model.training is True
+            assert model.training
 
 
 class TestOutputDirCreation:

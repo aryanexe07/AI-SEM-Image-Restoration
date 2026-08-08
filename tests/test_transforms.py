@@ -17,6 +17,7 @@ def test_paired_transforms_eval_mode() -> None:
 
     trans_in, trans_tgt = transform(input_arr, target_arr)
     assert np.array_equal(trans_in, input_arr)
+    assert trans_tgt is not None
     assert np.array_equal(trans_tgt, target_arr)
 
 
@@ -52,5 +53,9 @@ def test_sem_dataset_with_transforms(tmp_path: Path) -> None:
     )
     sample = dataset[0]
 
-    assert sample["input"].shape == (1, 128, 128)
-    assert sample["target"].shape == (1, 256, 256)
+    input_tensor = sample["input"]
+    target_tensor = sample["target"]
+    assert isinstance(input_tensor, torch.Tensor)
+    assert isinstance(target_tensor, torch.Tensor)
+    assert input_tensor.shape == (1, 128, 128)
+    assert target_tensor.shape == (1, 256, 256)

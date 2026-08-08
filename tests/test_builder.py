@@ -1,7 +1,7 @@
 """Unit tests for PyTorch DataLoader builder, collate function, and worker initialization."""
 
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 import numpy as np
 import pytest
@@ -55,11 +55,11 @@ class DummyDataset(Dataset):
     def __len__(self) -> int:
         return self.length
 
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
+    def __getitem__(self, index: int) -> Dict[str, Any]:
         return {
-            "input": torch.full((1, 64, 64), float(idx), dtype=torch.float32),
-            "target": torch.full((1, 64, 64), float(idx * 2), dtype=torch.float32),
-            "filename": f"dummy_{idx}",
+            "input": torch.full((1, 64, 64), float(index), dtype=torch.float32),
+            "target": torch.full((1, 64, 64), float(index * 2), dtype=torch.float32),
+            "filename": f"dummy_{index}",
         }
 
 
