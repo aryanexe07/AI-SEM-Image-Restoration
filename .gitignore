@@ -115,3 +115,8 @@ weights/finetuned/*
 datasets/*.npy
 datasets/*.png
 datasets/*.jpg
+
+# Developer-specific local configuration overrides
+configs/local.yaml
+configs/local*.yaml
+configs/experiments/local*.yaml

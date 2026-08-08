@@ -261,8 +261,13 @@ def load_config(
     if config_path:
         config_list.append(config_path)
 
-    override_list: Optional[List[Union[str, Path]]] = (
-        [experiment_path] if experiment_path else None
-    )
+    override_list: List[Union[str, Path]] = []
+    local_cfg = Path("configs/local.yaml")
+    if local_cfg.exists():
+        override_list.append(local_cfg)
+    if experiment_path:
+        override_list.append(experiment_path)
 
-    return Config.load_combined(config_list, override_files=override_list)
+    return Config.load_combined(
+        config_list, override_files=override_list if override_list else None
+    )
