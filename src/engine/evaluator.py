@@ -9,6 +9,9 @@ visualizations to disk.
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
