@@ -5,9 +5,9 @@ description: "Scaled NAFNet with width=64 on SEM dataset for 50 epochs."
 system:
   seed: 42
   device: "auto"
-  log_dir: "logs"
-  checkpoint_dir: "outputs/checkpoints"
-  tensorboard_dir: "outputs/tensorboard"
+  log_dir: "logs/exp003_nafnet_width64"
+  checkpoint_dir: "outputs/checkpoints/exp003_nafnet_width64"
+  tensorboard_dir: "outputs/tensorboard/exp003_nafnet_width64"
 
 data:
   dataset_dir: "./datasets"
