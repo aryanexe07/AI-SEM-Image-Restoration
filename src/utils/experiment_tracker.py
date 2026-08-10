@@ -71,7 +71,9 @@ def _normalize_dataset_path(path_str: Optional[Union[str, Path]]) -> str:
         return str(path_str)
 
 
-def _get_compute_environment(device_str: str = "cpu") -> Dict[str, Any]:
+def _get_compute_environment(
+    device_str: Union[str, torch.device] = "cpu"
+) -> Dict[str, Any]:
     """Capture current compute, GPU, PyTorch, and Python runtime information.
 
     Args:
@@ -80,19 +82,20 @@ def _get_compute_environment(device_str: str = "cpu") -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Dictionary containing device, GPU model, CUDA, and library versions.
     """
+    dev_str = str(device_str)
     is_cuda_avail = torch.cuda.is_available()
-    is_cuda_device = is_cuda_avail and ("cuda" in str(device_str).lower())
+    is_cuda_device = is_cuda_avail and ("cuda" in dev_str.lower())
 
     gpu_name = torch.cuda.get_device_name(0) if is_cuda_device else None
     cuda_ver = torch.version.cuda if is_cuda_avail else None
 
     return {
         "platform": _detect_platform(),
-        "device": device_str,
+        "device": dev_str,
         "gpu": gpu_name,
         "cuda_version": cuda_ver,
         "pytorch_version": str(torch.__version__),
-        "python_version": str(sys.version.split()[0]),
+        "python_version": sys.version.split()[0],
     }
 
 
@@ -282,7 +285,7 @@ class ExperimentTracker:
                 "id": self.exp_id,
                 "git_commit": self.git_commit,
                 "dataset": {
-                    "path": str(resolved_dataset_dir),
+                    "path": resolved_dataset_dir,
                     "splits": dataset_splits,
                 },
             },
@@ -327,7 +330,7 @@ class ExperimentTracker:
         if psnr_val is not None:
             curr_best = self.metrics_record["psnr"]["best"]
             if curr_best is None or psnr_val > curr_best:
-                self.metrics_record["psnr"]["best"] = round(float(psnr_val), 4)
+                self.metrics_record["psnr"]["best"] = round(psnr_val, 4)
                 self.metrics_record["psnr"]["epoch"] = epoch
 
         # SSIM (higher is better)
@@ -335,7 +338,7 @@ class ExperimentTracker:
         if ssim_val is not None:
             curr_best = self.metrics_record["ssim"]["best"]
             if curr_best is None or ssim_val > curr_best:
-                self.metrics_record["ssim"]["best"] = round(float(ssim_val), 4)
+                self.metrics_record["ssim"]["best"] = round(ssim_val, 4)
                 self.metrics_record["ssim"]["epoch"] = epoch
 
         # LPIPS (lower is better)
@@ -343,7 +346,7 @@ class ExperimentTracker:
         if lpips_val is not None:
             curr_best = self.metrics_record["lpips"]["best"]
             if curr_best is None or lpips_val < curr_best:
-                self.metrics_record["lpips"]["best"] = round(float(lpips_val), 4)
+                self.metrics_record["lpips"]["best"] = round(lpips_val, 4)
                 self.metrics_record["lpips"]["epoch"] = epoch
 
         self.record_dict["metrics"] = self.metrics_record

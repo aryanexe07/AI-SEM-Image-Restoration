@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 _LPIPS_MODEL_CACHE = {}
 
 
-def _get_lpips_model(net_type: str = "alex", device: str = "cpu"):
+def _get_lpips_model(
+    net_type: str = "alex", device: Union[str, torch.device] = "cpu"
+):
     """Retrieve or instantiate cached LPIPS model.
 
     Args:
