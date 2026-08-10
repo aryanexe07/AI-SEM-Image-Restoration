@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from src.utils.config import load_config
 from src.models.builder import build_model
-from src.engine.trainer import build_loss
+from src.losses.builder import build_loss
 
 def smoke_test(config_path):
     print(f"\n=== Smoke Test: {config_path} ===")
