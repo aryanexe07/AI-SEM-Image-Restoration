@@ -34,3 +34,8 @@
 # Checkpoint Management
 # checkpoint_dir:
 # save_top_k:
+
+metrics:
+  psnr: true
+  ssim: true
+  lpips: false

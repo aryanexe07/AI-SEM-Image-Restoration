@@ -19,6 +19,8 @@ from torch.utils.tensorboard import SummaryWriter
 
 from src.engine.checkpoint import CheckpointManager
 from src.engine.trainer import Trainer
+from src.utils.config import Config
+from src.utils.experiment_tracker import ExperimentTracker
 
 # ---------------------------------------------------------------------------
 # Synthetic fixtures
@@ -466,3 +468,39 @@ class TestFit:
         assert isinstance(result["best_val_psnr"], float)
         assert isinstance(result["history"], list)
         assert len(result["history"]) == 3
+
+    def test_fit_with_experiment_tracker(self, tmp_path) -> None:
+        val_dataset = SyntheticSEMDataset(num_samples=4, size=32)
+        val_loader = DataLoader(
+            val_dataset, batch_size=2, shuffle=False, collate_fn=_collate_fn
+        )
+        config = Config({"experiment_id": "trainer_tracker_test"})
+        tracker = ExperimentTracker(config=config, record_dir=tmp_path)
+
+        model = TinyModel()
+        train_loader = DataLoader(
+            val_dataset, batch_size=2, shuffle=False, collate_fn=_collate_fn
+        )
+        optimizer = optim.AdamW(model.parameters(), lr=1e-3)
+        criterion = nn.L1Loss()
+
+        trainer = Trainer(
+            model=model,
+            train_loader=train_loader,
+            criterion=criterion,
+            optimizer=optimizer,
+            val_loader=val_loader,
+            epochs=2,
+            experiment_tracker=tracker,
+            metrics_config={"psnr": True, "ssim": True, "lpips": False},
+        )
+
+        result = trainer.fit(start_epoch=1)
+
+        assert result["epochs_completed"] == 2
+        rec = tracker.to_dict()
+        assert rec["metrics"]["psnr"]["best"] is not None
+        assert rec["metrics"]["ssim"]["best"] is not None
+        assert rec["metrics"]["lpips"]["best"] is None  # LPIPS disabled
+        record_file = tmp_path / "trainer_tracker_test_record.yaml"
+        assert record_file.exists()

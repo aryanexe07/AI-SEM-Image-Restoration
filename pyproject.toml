@@ -35,6 +35,7 @@ dependencies = [
     "timm",
     "pillow",
     "scipy",
+    "lpips",
 ]
 
 [project.optional-dependencies]

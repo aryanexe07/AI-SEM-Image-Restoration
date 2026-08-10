@@ -16,7 +16,9 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from src.engine.checkpoint import CheckpointManager
+from src.metrics.lpips import calculate_lpips
 from src.metrics.psnr_ssim import calculate_psnr, calculate_ssim
+from src.utils.experiment_tracker import ExperimentTracker
 
 
 class Trainer:
@@ -72,6 +74,8 @@ class Trainer:
         amp_dtype: str = "float16",
         val_freq: int = 1,
         log_freq: int = 10,
+        experiment_tracker: Optional[ExperimentTracker] = None,
+        metrics_config: Optional[Dict[str, bool]] = None,
     ) -> None:
         self.model = model
         self.train_loader = train_loader
@@ -86,6 +90,8 @@ class Trainer:
         self.grad_clip_norm = grad_clip_norm
         self.val_freq = val_freq
         self.log_freq = log_freq
+        self.experiment_tracker = experiment_tracker
+        self.metrics_config = metrics_config or {"psnr": True, "ssim": True, "lpips": False}
 
         # Determine device type for AMP autocast
         self.device_type = "cuda" if self.device.type == "cuda" else "cpu"
@@ -177,23 +183,36 @@ class Trainer:
     def validate(self, epoch: int) -> Dict[str, float]:
         """Execute validation over the validation DataLoader.
 
-        Computes validation loss, PSNR, and SSIM using the existing
-        metric implementations from ``src.metrics.psnr_ssim``.
+        Computes validation loss, PSNR, SSIM, and optional LPIPS depending on
+        ``self.metrics_config``.
 
         Args:
             epoch: Current epoch number (for logging purposes).
 
         Returns:
-            Dict with keys ``"val_loss"``, ``"val_psnr"``, ``"val_ssim"``.
+            Dict containing validation metrics.
         """
         if self.val_loader is None:
-            return {"val_loss": 0.0, "val_psnr": 0.0, "val_ssim": 0.0}
+            res: Dict[str, float] = {"val_loss": 0.0}
+            if self.metrics_config.get("psnr", True):
+                res["val_psnr"] = 0.0
+            if self.metrics_config.get("ssim", True):
+                res["val_ssim"] = 0.0
+            if self.metrics_config.get("lpips", False):
+                res["val_lpips"] = 0.0
+            return res
 
         self.model.eval()
         total_loss = 0.0
         total_psnr = 0.0
         total_ssim = 0.0
+        total_lpips = 0.0
+        lpips_count = 0
         total_samples = 0
+
+        eval_psnr = self.metrics_config.get("psnr", True)
+        eval_ssim = self.metrics_config.get("ssim", True)
+        eval_lpips = self.metrics_config.get("lpips", False)
 
         with torch.no_grad():
             for batch in self.val_loader:
@@ -211,26 +230,47 @@ class Trainer:
 
                 total_loss += loss.item() * batch_size
 
-                # Metrics — calculate_psnr and calculate_ssim handle
-                # detaching and per-sample averaging internally
-                psnr_val = calculate_psnr(output, target, data_range=1.0)
-                ssim_val = calculate_ssim(output, target, data_range=1.0)
+                if eval_psnr:
+                    psnr_val = calculate_psnr(output, target, data_range=1.0)
+                    total_psnr += psnr_val * batch_size
 
-                total_psnr += psnr_val * batch_size
-                total_ssim += ssim_val * batch_size
+                if eval_ssim:
+                    ssim_val = calculate_ssim(output, target, data_range=1.0)
+                    total_ssim += ssim_val * batch_size
+
+                if eval_lpips:
+                    lpips_val = calculate_lpips(
+                        output, target, data_range=1.0, device=str(self.device)
+                    )
+                    if lpips_val is not None:
+                        total_lpips += lpips_val * batch_size
+                        lpips_count += batch_size
+
                 total_samples += batch_size
 
         # Restore training mode
         self.model.train()
 
-        if total_samples == 0:
-            return {"val_loss": 0.0, "val_psnr": 0.0, "val_ssim": 0.0}
-
-        return {
-            "val_loss": total_loss / total_samples,
-            "val_psnr": total_psnr / total_samples,
-            "val_ssim": total_ssim / total_samples,
+        metrics_res: Dict[str, float] = {
+            "val_loss": total_loss / total_samples if total_samples > 0 else 0.0,
         }
+
+        if eval_psnr:
+            metrics_res["val_psnr"] = (
+                total_psnr / total_samples if total_samples > 0 else 0.0
+            )
+
+        if eval_ssim:
+            metrics_res["val_ssim"] = (
+                total_ssim / total_samples if total_samples > 0 else 0.0
+            )
+
+        if eval_lpips:
+            metrics_res["val_lpips"] = (
+                total_lpips / lpips_count if lpips_count > 0 else 0.0
+            )
+
+        return metrics_res
 
     def fit(self, start_epoch: int = 1) -> Dict[str, Any]:
         """Execute the full training loop across all epochs.
@@ -238,7 +278,7 @@ class Trainer:
         For each epoch:
             1. Run training epoch.
             2. Step scheduler (epoch-level).
-            3. If validation epoch: run validation, log metrics, save checkpoint.
+            3. If validation epoch: run validation, update experiment tracker, log metrics, save checkpoint.
 
         Args:
             start_epoch: Starting epoch number (1-indexed). Used for resume.
@@ -271,15 +311,24 @@ class Trainer:
                 val_metrics = self.validate(epoch)
                 epoch_record.update(val_metrics)
 
-                if val_metrics["val_psnr"] > best_val_psnr:
-                    best_val_psnr = val_metrics["val_psnr"]
+                val_psnr = val_metrics.get("val_psnr")
+                if val_psnr is not None and val_psnr > best_val_psnr:
+                    best_val_psnr = val_psnr
+
+                # Update ExperimentTracker incrementally after validation epoch
+                if self.experiment_tracker is not None:
+                    self.experiment_tracker.update_validation(epoch, val_metrics)
 
                 # TensorBoard epoch-level logging
                 if self.writer is not None:
                     self.writer.add_scalar("Train/Loss", train_loss, epoch)
                     self.writer.add_scalar("Val/Loss", val_metrics["val_loss"], epoch)
-                    self.writer.add_scalar("Val/PSNR", val_metrics["val_psnr"], epoch)
-                    self.writer.add_scalar("Val/SSIM", val_metrics["val_ssim"], epoch)
+                    if "val_psnr" in val_metrics:
+                        self.writer.add_scalar("Val/PSNR", val_metrics["val_psnr"], epoch)
+                    if "val_ssim" in val_metrics:
+                        self.writer.add_scalar("Val/SSIM", val_metrics["val_ssim"], epoch)
+                    if "val_lpips" in val_metrics:
+                        self.writer.add_scalar("Val/LPIPS", val_metrics["val_lpips"], epoch)
                     lr = self.optimizer.param_groups[0]["lr"]
                     self.writer.add_scalar("Train/LR", lr, epoch)
 
@@ -290,7 +339,7 @@ class Trainer:
                         model=self.model,
                         optimizer=self.optimizer,
                         scheduler=self.scheduler,
-                        metric=val_metrics["val_psnr"],
+                        metric=val_psnr,
                     )
 
             history.append(epoch_record)
