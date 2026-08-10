@@ -120,3 +120,8 @@ datasets/*.jpg
 configs/local.yaml
 configs/local*.yaml
 configs/experiments/local*.yaml
+
+# Graphify internal cache and temporary analysis files
+graphify-out/cache/
+graphify-out/.graphify_*
+
