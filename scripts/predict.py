@@ -22,6 +22,8 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 import torch
+import sys
+sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
 from src.engine.checkpoint import CheckpointManager
 from src.engine.inference import slide_window_inference
