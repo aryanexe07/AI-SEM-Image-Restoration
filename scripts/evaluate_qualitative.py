@@ -22,8 +22,6 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import numpy as np
 import torch
-import sys
-sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
 from src.datasets.scanner import DatasetPair, DatasetScanner
 from src.engine.inference import slide_window_inference
