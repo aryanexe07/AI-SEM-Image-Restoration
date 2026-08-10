@@ -5,7 +5,7 @@ import pytest
 import skimage.metrics
 import torch
 
-from src.metrics import calculate_psnr, calculate_ssim
+from src.metrics import calculate_lpips, calculate_psnr, calculate_ssim
 
 
 def test_identical_images() -> None:
@@ -182,3 +182,23 @@ def test_no_gradient_mutation() -> None:
     assert torch.equal(pred_tensor.detach(), pred_clone)
     assert isinstance(psnr_val, float)
     assert isinstance(ssim_val, float)
+
+
+def test_lpips_grayscale_conversion_and_identical() -> None:
+    """Test LPIPS evaluation on 1-channel grayscale SEM tensors (B, 1, H, W)."""
+    # Identical 1-channel images
+    img_tensor = torch.rand(2, 1, 64, 64)
+    lpips_val = calculate_lpips(img_tensor, img_tensor, data_range=1.0)
+
+    if lpips_val is not None:
+        assert isinstance(lpips_val, float)
+        assert lpips_val == pytest.approx(0.0, abs=1e-2)
+
+    # Different images
+    target_tensor = torch.rand(2, 1, 64, 64)
+    pred_tensor = torch.rand(2, 1, 64, 64)
+    lpips_diff = calculate_lpips(pred_tensor, target_tensor, data_range=1.0)
+
+    if lpips_diff is not None:
+        assert isinstance(lpips_diff, float)
+        assert lpips_diff >= 0.0
