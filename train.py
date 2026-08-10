@@ -32,6 +32,7 @@ from src.engine.trainer import Trainer
 from src.losses.builder import build_loss
 from src.models.builder import build_model
 from src.utils.config import Config, load_config
+from src.utils.experiment_tracker import ExperimentTracker
 from src.utils.logger import setup_logger
 from src.utils.seed import set_seed
 
@@ -240,7 +241,20 @@ def main(args: Optional[argparse.Namespace] = None) -> Dict[str, Any]:
         start_epoch = int(checkpoint["epoch"]) + 1
         logger.info(f"Resuming training starting at epoch {start_epoch}")
 
-    # 13. Construct Trainer
+    # 13. Construct ExperimentTracker & Trainer
+    metrics_config = _get_config_val(
+        config, ["metrics"], default={"psnr": True, "ssim": True, "lpips": False}
+    )
+    experiment_tracker = ExperimentTracker(
+        config=config,
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        criterion=criterion,
+        dataset_dir=dataset_dir,
+    )
+    logger.info(f"Initialized ExperimentTracker record: {experiment_tracker.record_file_path}")
+
     use_amp = bool(
         _get_config_val(
             config, ["train.mixed_precision", "train.use_amp", "use_amp"], default=False
@@ -276,6 +290,8 @@ def main(args: Optional[argparse.Namespace] = None) -> Dict[str, Any]:
         amp_dtype=amp_dtype,
         val_freq=val_freq,
         log_freq=log_freq,
+        experiment_tracker=experiment_tracker,
+        metrics_config=metrics_config,
     )
 
     # 14. Start training loop
@@ -283,6 +299,7 @@ def main(args: Optional[argparse.Namespace] = None) -> Dict[str, Any]:
         f"Starting training run (Epochs {start_epoch} to {epochs}, Device: {device_str})..."
     )
     summary = trainer.fit(start_epoch=start_epoch)
+    summary["experiment_record_path"] = str(experiment_tracker.record_file_path)
     logger.info(
         f"Training completed successfully. Total epochs completed: {summary['epochs_completed']}"
     )

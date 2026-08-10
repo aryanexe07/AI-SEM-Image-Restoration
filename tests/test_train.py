@@ -162,6 +162,7 @@ def test_main_pipeline_fresh_start(
     assert isinstance(trainer_kwargs["optimizer"], optim.AdamW)
     assert trainer_kwargs["epochs"] == 2
     assert trainer_kwargs["device"] in ("cuda", "cpu")
+    assert trainer_kwargs["experiment_tracker"] is not None
 
     mock_trainer_instance.fit.assert_called_once_with(start_epoch=1)
     assert summary["epochs_completed"] == 2
