@@ -208,7 +208,21 @@ However, instrument-related effects should not be added to the benchmark degrada
 The major remaining uncertainty is the relationship between the provided training degradation and the hidden evaluation distribution. This requires experimental generalization analysis rather than assumption.
 
 ---
+## Engineering Takeaways
 
+The literature review does not prescribe a specific model architecture or training strategy.
+
+The evidence instead establishes the following constraints for subsequent experiments:
+
+- Treat additive Gaussian noise, multiplicative speckle noise, and 2× downsampling as the confirmed benchmark degradations.
+- Do not assume a fixed degradation ordering.
+- Do not introduce additional physical SEM artifacts into the benchmark definition without project evidence.
+- Treat synthetic degradation augmentation as an experimental hypothesis rather than a guaranteed improvement.
+- Evaluate robustness across degradation severity and image/content variation using held-out data.
+- Preserve the distinction between benchmark-confirmed degradation mechanisms and broader SEM acquisition artifacts.
+
+These findings should inform, but not predetermine, Issues #39, #40, and #41.
+---
 ## Evidence Classification
 
 | Classification | Meaning |
