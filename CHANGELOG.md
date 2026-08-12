@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Workspace Skill `.agents/skills/auto-documenter/SKILL.md` for automated experiment, benchmark, and test logging.
+
+### Changed
+- Comprehensive update to `README.md` incorporating KLA Hackathon problem physics, embedded dataset visuals, NAFNet architecture diagrams, and empirical capacity scaling benchmarks.
+
 ## [0.1.0] - 2026-08-06
 
 ### Added
@@ -14,3 +22,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pre-commit configuration (`.pre-commit-config.yaml`) and pyproject tool settings.
 - Environment template (`.env.example`) and unpinned dependency definitions.
 - Asset, figure, weight, experiment, log, and output directory structure.
+
